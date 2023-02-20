@@ -1,35 +1,30 @@
-describe("Search", () => {
-  it("open website", () => {
-    cy.visit(
-      "https://www.sainsburys.co.uk/shop/gb/groceries/price-lock-/price-lock-drinks?fromMegaNav=1"
-    );
+describe("Recipes", () => {
+  beforeEach("open website", () => {
+    cy.visit("https://www.sainsburys.co.uk/gol-ui/recipes");
     cy.contains("Accept All Cookies").click();
+  });
 
-    /*
-    // verify the page
-    //cy.get("h1").should("contain", "Drinks");
+  it.only("verify page", () => {
+    cy.url().should("contain", "recipes");
 
-    // when we click on this container with text is not visible
-    cy.get(".mAccordion-header").click();
-    cy.get(".readMoreTarget").not("be.visible");
-    */
+    cy.get(".nav__menu-wrapper")
+      .contains("Recipes")
+      .should("have.class", "nav__menu-link--selected");
+  });
 
-    // filter drinks
-    const options = [
-      "Sainsbury's",
-      "Rubicon",
-      "Lucozade",
-      "Nescafe",
-      "Coca-Cola",
-    ];
+  it("verify search results", () => {
+    const searchFor = ["rice", "pasta", "salad", "pizza", "rice", "salmon"];
 
-    cy.get(".field.topBrands").contains("Rubicon").click();
-    /* cy.get(".productLister.gridView")
-      .find("li")
-      .each((item, index, list) => {
-        cy.wrap(item).should("contain", "Rubicon");
-      });
-  */
-    cy.get(".productNameAndPromotions").eq(0).should("contain", "Rubicon");
+    searchFor.forEach((category) => {
+      cy.get("#recipes-search-bar-input").type(`${category}{enter}`);
+      cy.get(".show-more > .ln-c-button").click();
+
+      cy.wait(2000);
+
+      cy.get(".recipes-search-results__tabs")
+        .find(".recipe-tile__title-block")
+        .should("contain", category);
+      cy.get("#recipes-search-bar-input").clear();
+    });
   });
 });
