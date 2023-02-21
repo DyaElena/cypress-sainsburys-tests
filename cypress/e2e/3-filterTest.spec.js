@@ -1,6 +1,8 @@
 describe("Search", () => {
   it("open website", () => {
-    cy.visit("https://www.sainsburys.co.uk/gol-ui/recipes");
+    cy.visit(
+      "https://www.sainsburys.co.uk/shop/gb/groceries/price-lock-/price-lock-drinks"
+    );
     cy.contains("Accept All Cookies").click();
 
     //verify the page
@@ -16,6 +18,10 @@ describe("Search", () => {
       cy.wrap($item)
         .find(" .productNameAndPromotions > h3 > a")
         .as("description");
+
+      cy.wait(3000);
+
+      cy.get("@description").should("contain", "Rubicon");
     });
   });
 });
