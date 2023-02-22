@@ -12,16 +12,17 @@ describe("Search", () => {
     cy.get(".mAccordion-header").click();
     cy.get(".readMoreTarget").not("be.visible");
 
-    //filter Rubicon drinks
-    cy.get(".field.topBrands").contains("Rubicon").click();
-    cy.get(".productLister > li").each(($item) => {
-      cy.wrap($item)
-        .find(" .productNameAndPromotions > h3 > a")
-        .as("description");
-
-      cy.wait(3000);
-
-      cy.get("@description").should("contain", "Rubicon");
+    //filter Rubicon drink
+    Cypress.Commands.add("checkRubiconFilter", (listSelector, itemSelector) => {
+      cy.get(listSelector)
+        .find(itemSelector)
+        .each(($item) => {
+          cy.wrap($item).find(".productNameAndPromotions > h3 > a").as("name");
+          cy.get("@name").should("contain", "Rubicon");
+        });
     });
+
+    cy.get(".field.topBrands").contains("Rubicon").click();
+    cy.checkRubiconFilter(".productLister", "li");
   });
 });

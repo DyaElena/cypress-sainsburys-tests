@@ -1,9 +1,6 @@
 describe("Recipes", () => {
   beforeEach("open website", () => {
-    cy.visit(
-      "https://www.sainsburys.co.uk/shop/gb/groceries/drinks?fromMegaNav=1"
-    );
-
+    cy.visit("https://www.sainsburys.co.uk/gol-ui/recipes");
     cy.contains("Accept All Cookies").click();
   });
 
@@ -15,23 +12,44 @@ describe("Recipes", () => {
       .should("have.class", "nav__menu-link--selected");
   });
 
-  /* WORKING ON IT
-    function loadAllResults() {
-     document.getElementById("#show-more-button");
-      }
-      
-  it.only("load more", () => {
+  it.only("load more for 10 minutes recipes", () => {
     cy.contains("Quick and easy").click();
     cy.get(".recipes_browse__dropdown_view__list")
       .contains("10 minutes")
       .click();
-      if (button.is(":visible")) {
-        loadAllResults().click();
-        cy.wait(2000);
-      
-    });
+
+    let numItems = 0;
+    let prevNumItems = 0;
+    let maxIterations = 4; // Set a maximum number of iterations
+    let iteration = 0;
+
+    function loadMore() {
+      iteration++;
+      cy.get(
+        "[class='ln-o-grid ln-o-grid--matrix ln-o-grid--equal-height'] > div"
+      ).then(($items) => {
+        numItems = $items.length;
+        if (numItems === prevNumItems || iteration >= maxIterations) {
+          // All items are loaded or reached the maximum number of iterations
+          return;
+        }
+        prevNumItems = numItems;
+        cy.get('[data-test-id="show-more-button"]').click();
+      });
+
+      // Check if the "Show more" button is visible
+      cy.get('[data-test-id="show-more-button"]').then(($button) => {
+        if (!$button.is(":visible") || iteration >= maxIterations) {
+          // All items are loaded or reached the maximum number of iterations
+          return;
+        }
+        cy.wait(1000); // Wait for new items to load
+        loadMore(); // Call the function again for the next iteration
+      });
+    }
+
+    loadMore(); // Call the function for the first time
   });
-*/
 
   it("verify correct cooking time filter", () => {
     const cookingTimeFilter = ["10 minutes", "20 minutes", "30 minutes"];
